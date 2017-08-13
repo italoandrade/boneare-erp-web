@@ -1,0 +1,699 @@
+<div class="ui-s960">
+    <form #formClient="ngForm" class="ui-validate on-dirty on-submit" (submit)="onSubmit(formClient)">
+        <ui-card [class.loading]="loading">
+            <div class="ui-progress" [class.hide]="!loading">
+                <div class="indeterminate"></div>
+            </div>
+            <ui-toolbar class="flat">
+                <button class="ui-button flat icon" type="button" uiRipple (click)="goBack()">
+                    <i class="material-icons">arrow_back</i>
+                </button>
+                <span class="title">
+                    {{addingNew ? 'Novo cliente' : (loading ? 'Carregando' : 'Alterando ' + (info.name || ''))}}</span>
+                <div class="align-right" *ngIf="!addingNew">
+                    <button class="ui-button flat icon" type="button" uiRipple
+                            [disabled]="saving || deleting || loading" [uiMenuTrigger]="menuDelete" align="right">
+                        <i class="material-icons" *ngIf="!deleting">delete</i>
+                        <ui-progress-radial class="indeterminate" *ngIf="deleting"></ui-progress-radial>
+                    </button>
+                </div>
+            </ui-toolbar>
+            <fieldset [disabled]="saving || deleting || loading">
+                <ui-card-content>
+                    <ui-input-container>
+                        <select id="inputTypeId" #fieldTypeId="ngModel" [(ngModel)]="info.typeId" uiInput name="typeId">
+                            <option></option>
+                            <option *ngFor="let type of typesClient" [ngValue]="type.id">
+                                {{type.name}}
+                            </option>
+                        </select>
+                        <label for="inputTypeId">{{typesClient.loaded ? 'Tipo' : 'Carregando tipos'}}</label>
+                    </ui-input-container>
+                    <ui-input-container>
+                        <input id="inputName" #fieldName="ngModel" type="text" [(ngModel)]="info.name"
+                               uiInput name="name" required uiMaxlength="255">
+                        <label for="inputName">Nome Fantasia</label>
+                        <div class="ui-messages">
+                            <div *ngIf="fieldName.errors && fieldName.dirty">
+                                <div class="ui-message error"
+                                     [hidden]="!fieldName.pristine && !fieldName.errors.required">
+                                    Nome é obrigatório
+                                </div>
+                                <div class="ui-message counter error" [hidden]="!fieldName.errors.uiMaxlength">
+                                    {{info.name ? info.name.length : 0}}/255
+                                </div>
+                            </div>
+                        </div>
+                    </ui-input-container>
+                    <ui-input-container>
+                        <input id="inputRazaoSocial" #fieldRazaoSocial="ngModel" type="text"
+                               [(ngModel)]="info.razaoSocial" uiInput name="razaoSocial" uiMaxlength="255">
+                        <label for="inputRazaoSocial">Razão Social</label>
+                        <div class="ui-messages">
+                            <div *ngIf="fieldRazaoSocial.errors && fieldRazaoSocial.dirty">
+                                <div class="ui-message counter error" [hidden]="!fieldRazaoSocial.errors.uiMaxlength">
+                                    {{info.razaoSocial ? info.razaoSocial.length : 0}}/255
+                                </div>
+                            </div>
+                        </div>
+                    </ui-input-container>
+                    <ui-input-container>
+                        <input id="inputContactName" #fieldContactName="ngModel" type="text"
+                               [(ngModel)]="info.contactName" uiInput name="contactName" uiMaxlength="100">
+                        <label for="inputContactName">Nome do Contato</label>
+                        <div class="ui-messages">
+                            <div *ngIf="fieldContactName.errors && fieldContactName.dirty">
+                                <div class="ui-message counter error" [hidden]="!fieldContactName.errors.uiMaxlength">
+                                    {{info.contactName ? info.contactName.length : 0}}/100
+                                </div>
+                            </div>
+                        </div>
+                    </ui-input-container>
+                    <ui-input-container>
+                        <input id="inputCnpj" #fieldCnpj="ngModel" type="text" [(ngModel)]="info.cnpj" uiInput
+                               uiMaskCnpj name="cnpj">
+                        <label for="inputCnpj">CNPJ</label>
+                        <div class="ui-messages">
+                            <div *ngIf="fieldCnpj.errors && fieldCnpj.dirty">
+                                <div class="ui-message error" [hidden]="!fieldCnpj.errors.parse">
+                                    CNPJ inválido
+                                </div>
+                                <div class="ui-message error"
+                                     [hidden]="!fieldCnpj.hasError(['existingCnpj'])">
+                                    CNPJ existente
+                                </div>
+                            </div>
+                        </div>
+                    </ui-input-container>
+                    <ui-input-container>
+                        <select id="inputRegionId" #fieldRegionId="ngModel" [(ngModel)]="info.regionId" uiInput
+                                name="regionId">
+                            <option></option>
+                            <option *ngFor="let region of regions" [ngValue]="region.id">
+                                {{region.name}}
+                            </option>
+                        </select>
+                        <label for="inputRegionId">{{regions.loaded ? 'Região' : 'Carregando regiões'}}</label>
+                    </ui-input-container>
+                    <ui-input-container>
+                        <input id="inputInscricaoEstadual" #fieldInscricaoEstadual="ngModel" type="text"
+                               [(ngModel)]="info.inscricaoEstadual" uiInput name="inscricaoEstadual" uiMaxlength="20">
+                        <label for="inputInscricaoEstadual">Inscrição Estadual</label>
+                        <div class="ui-messages">
+                            <div *ngIf="fieldInscricaoEstadual.errors && fieldInscricaoEstadual.dirty">
+                                <div class="ui-message counter error"
+                                     [hidden]="!fieldInscricaoEstadual.errors.uiMaxlength">
+                                    {{info.inscricaoEstadual ? info.inscricaoEstadual.length : 0}}/20
+                                </div>
+                            </div>
+                        </div>
+                    </ui-input-container>
+                    <ui-input-container>
+                        <input id="inputAddress" #fieldAddress="ngModel" type="text" [(ngModel)]="info.address" uiInput
+                               name="address" uiMaxlength="255">
+                        <label for="inputAddress">Endereço</label>
+                        <div class="ui-messages">
+                            <div *ngIf="fieldAddress.errors && fieldAddress.dirty">
+                                <div class="ui-message counter error" [hidden]="!fieldAddress.errors.uiMaxlength">
+                                    {{info.address ? info.address.length : 0}}/255
+                                </div>
+                            </div>
+                        </div>
+                    </ui-input-container>
+                    <ui-switch-container>
+                        <label for="inputRecurringOrder" class="info">
+                            Pedido recorrente
+                            <span class="secondary">{{info.recurringOrder ? 'Sim' : 'Não'}}</span>
+                        </label>
+                        <ui-switch class="action">
+                            <input id="inputRecurringOrder" type="checkbox" name="recurringOrder"
+                                   [checked]="info.recurringOrder"
+                                   (change)="info.recurringOrder = $event.target.checked">
+                        </ui-switch>
+                    </ui-switch-container>
+                    <div *ngIf="info.recurringOrder" class="ui-flex-container break-on-s480">
+                        <ui-input-container>
+                            <input id="inputRecurringDate" #fieldRecurringDate="ngModel" type="text"
+                                   [(ngModel)]="info.recurringDate" uiInput name="recurringDate" uiMaxlength="20">
+                            <label for="inputRecurringDate">Dia(s) de recorrência</label>
+                            <div class="ui-messages">
+                                <div *ngIf="fieldRecurringDate.errors && fieldRecurringDate.dirty">
+                                    <div class="ui-message counter error"
+                                         [hidden]="!fieldRecurringDate.errors.uiMaxlength">
+                                        {{info.recurringDate ? info.recurringDate.length : 0}}/20
+                                    </div>
+                                </div>
+                            </div>
+                        </ui-input-container>
+                        <ui-input-container>
+                            <select id="inputTypeRecurringId" #fieldTypeRecurringId="ngModel"
+                                    [(ngModel)]="info.typeRecurringId" uiInput name="typeRecurringId" required>
+                                <option></option>
+                                <option *ngFor="let type of typesRecurring" [ngValue]="type.id">
+                                    {{type.name}}
+                                </option>
+                            </select>
+                            <label for="inputTypeRecurringId">
+                                {{typesRecurring.loaded ? 'Tipo de recorrência' : 'Carregando tipos de recorrência'}}
+                            </label>
+                            <div class="ui-messages">
+                                <div *ngIf="fieldTypeRecurringId.errors && fieldTypeRecurringId.dirty">
+                                    <div class="ui-message error"
+                                         [hidden]="!fieldTypeRecurringId.pristine && !fieldTypeRecurringId.errors.required">
+                                        Tipo de recorrência é obrigatório
+                                    </div>
+                                </div>
+                            </div>
+                        </ui-input-container>
+                    </div>
+                    <ui-smart-list #phones [model]="info.phones">
+                        <ui-subheader>Telefone{{info.phones.length > 1 ? 's' : ''}}</ui-subheader>
+                        <ui-smart-list-item *ngFor="let item of phones.list; let i = index;">
+                            <div class="ui-flex-container">
+                                <div class="ui-flex-container break-on-s480">
+                                    <ui-input-container>
+                                        <input [id]="'input' + i + 'phone'" #fieldPhone="ngModel" type="tel"
+                                               [name]="i + 'phone'" [(ngModel)]="item.phone" uiInput
+                                               [required]="i < phones.list.length - 1" uiMaskPhone autocomplete="off">
+                                        <label [for]="'input' + i + 'phone'">Número</label>
+                                        <div class="ui-messages">
+                                            <div *ngIf="fieldPhone.errors && fieldPhone.dirty">
+                                                <div class="ui-message error"
+                                                     [hidden]="!fieldPhone.pristine && !fieldPhone.errors.required">
+                                                    Número é obrigatório
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui-input-container>
+                                    <ui-input-container>
+                                        <input [id]="'input' + i + 'phoneDescription'" #fieldPhoneDescription="ngModel"
+                                               type="text" [(ngModel)]="item.description" uiInput
+                                               [name]="i + 'phoneDescription'" uiMaxlength="255" autocomplete="off">
+                                        <label [for]="'input' + i + 'phoneDescription'">Descrição</label>
+                                        <div class="ui-messages">
+                                            <div *ngIf="fieldPhoneDescription.errors && fieldPhoneDescription.dirty">
+                                                <div class="ui-message counter error"
+                                                     [hidden]="!fieldPhoneDescription.errors.uiMaxlength">
+                                                    {{info.recurringDate ? info.recurringDate.length : 0}}/255
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui-input-container>
+                                </div>
+                                <div style="width: 100%; max-width: 36px;display: flex;">
+                                    <button *ngIf="i < phones.list.length - 1"
+                                            (click)="phones.remove(i);"
+                                            class="ui-button icon flat" type="button" uiRipple>
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </ui-smart-list-item>
+                    </ui-smart-list>
+                    <ui-smart-list #emails [model]="info.emails">
+                        <ui-subheader>E-mail{{info.emails.length > 1 ? 's' : ''}}</ui-subheader>
+                        <ui-smart-list-item *ngFor="let item of emails.list; let i = index;">
+                            <div class="ui-flex-container">
+                                <div class="ui-flex-container break-on-s480">
+                                    <ui-input-container>
+                                        <input [id]="'input' + i + 'email'" #fieldEmail="ngModel" type="email"
+                                               [name]="i + 'email'" [(ngModel)]="item.email" uiInput
+                                               [required]="i < emails.list.length - 1" uiMaxlength="255"
+                                               pattern="[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*"
+                                               autocomplete="off">
+                                        <label [for]="'input' + i + 'email'">E-mail</label>
+                                        <div class="ui-messages">
+                                            <div *ngIf="fieldEmail.errors && fieldEmail.dirty">
+                                                <div class="ui-message error"
+                                                     [hidden]="!fieldEmail.pristine && !fieldEmail.errors.required">
+                                                    E-mail é obrigatório
+                                                </div>
+                                                <div class="ui-message error"
+                                                     [hidden]="!fieldEmail.errors.pattern">
+                                                    E-mail está inválido
+                                                </div>
+                                                <div class="ui-message counter error"
+                                                     [hidden]="!fieldEmail.errors.uiMaxlength">
+                                                    {{item.email ? item.email.length : 0}}/255
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui-input-container>
+                                    <ui-input-container>
+                                        <input [id]="'input' + i + 'emailDescription'" #fieldEmailDescription="ngModel"
+                                               type="text" [(ngModel)]="item.description" uiInput
+                                               [name]="i + 'emailDescription'" uiMaxlength="255" autocomplete="off">
+                                        <label [for]="'input' + i + 'emailDescription'">Descrição</label>
+                                        <div class="ui-messages">
+                                            <div *ngIf="fieldEmailDescription.errors && fieldEmailDescription.dirty">
+                                                <div class="ui-message counter error"
+                                                     [hidden]="!fieldEmailDescription.errors.uiMaxlength">
+                                                    {{info.recurringDate ? info.recurringDate.length : 0}}/255
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui-input-container>
+                                </div>
+                                <div style="width: 100%; max-width: 36px;display: flex;">
+                                    <button *ngIf="i < emails.list.length - 1"
+                                            (click)="emails.remove(i);"
+                                            class="ui-button icon flat" type="button" uiRipple>
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </ui-smart-list-item>
+                    </ui-smart-list>
+                    <div class="secondary-text" *ngIf="info.userNameAdded">
+                        <div>
+                            Cadastrado por {{info.userNameAdded}}
+                            em {{info.dateAdded | date : 'dd/MM/yyyy hh:mm'}}
+                        </div>
+                        <div *ngIf="info.userNameUpdated">
+                            Alterado por {{info.userNameUpdated}}
+                            em {{info.dateUpdated | date : 'dd/MM/yyyy hh:mm'}}
+                        </div>
+                    </div>
+                    <!--<div class="ui-flex-container break-on-s480">
+                        <ui-input-container *ngIf="sistema.multiempresa">
+                            <select id="inputIdEmpresa" #fieldIdEmpresa [(ngModel)]="info.idEmpresa" uiInput
+                                    name="idEmpresa"
+                                    required>
+                                <option></option>
+                                <option *ngFor="let empresa of empresas" [ngValue]="empresa.id">
+                                    {{empresa.nome}}
+                                </option>
+                            </select>
+                            <label for="inputIdEmpresa">{{empresas.carregado ? 'Empresa' : 'Carregando
+                                empresas'}}</label>
+                            <div class="ui-messages">
+                                <div *ngIf="fieldIdEmpresa.errors && fieldIdEmpresa.dirty">
+                                    <div class="ui-message error"
+                                         [hidden]="!fieldIdEmpresa.pristine && !fieldIdEmpresa.errors.required">
+                                        Empresa é obrigatório
+                                    </div>
+                                </div>
+                            </div>
+                        </ui-input-container>
+                        <ui-input-container *ngIf="sistema.idTipoAutenticacao === 2">
+                            <select id="inputIdGrupo" #fieldIdGrupo [(ngModel)]="info.idGrupo" uiInput
+                                    name="idGrupo"
+                                    required>
+                                <option></option>
+                                <option *ngFor="let grupo of grupos" [ngValue]="grupo.id">{{grupo.nome}}
+                                </option>
+                            </select>
+                            <label for="inputIdGrupo">{{grupos.carregado ? 'Grupo' : 'Carregando
+                                grupos'}}</label>
+                            <div class="ui-messages">
+                                <div *ngIf="fieldIdGrupo.errors && fieldIdGrupo.dirty">
+                                    <div class="ui-message error"
+                                         [hidden]="!fieldIdGrupo.hasError(['notFound'])">
+                                        Grupo não encontrado
+                                    </div>
+                                </div>
+                            </div>
+                        </ui-input-container>
+                        <ui-input-container *ngIf="sistema.idTipoAutenticacao === 1">
+                            &lt;!&ndash;<select id="inputIdSuperior" #fieldIdSuperior="ngModel"&ndash;&gt;
+                            &lt;!&ndash;[(ngModel)]="info.idSuperior" uiInput&ndash;&gt;
+                            &lt;!&ndash;name="idSuperior"&ndash;&gt;
+                            &lt;!&ndash;[disabled]="!usuarios.carregado"&ndash;&gt;
+                            &lt;!&ndash;[class.elevate]="info.idSuperior === null">&ndash;&gt;
+                            &lt;!&ndash;<option [ngValue]="null" label="Nenhum"></option>&ndash;&gt;
+                            &lt;!&ndash;<option *ngFor="let usuario of usuarios" [ngValue]="usuario.id"&ndash;&gt;
+                            &lt;!&ndash;[label]="usuario.nome">&ndash;&gt;
+                            &lt;!&ndash;</option>&ndash;&gt;
+                            &lt;!&ndash;</select>&ndash;&gt;
+                            &lt;!&ndash;<label for="inputIdSuperior">&ndash;&gt;
+                            &lt;!&ndash;{{usuarios.carregado ? 'Usuário superior' : 'Carregando usuários'}}&ndash;&gt;
+                            &lt;!&ndash;</label>&ndash;&gt;
+                            &lt;!&ndash;<div class="ui-messages">&ndash;&gt;
+                            &lt;!&ndash;<div *ngIf="fieldIdSuperior.errors && fieldIdSuperior.dirty">&ndash;&gt;
+                            &lt;!&ndash;<div class="ui-message error"&ndash;&gt;
+                            &lt;!&ndash;[hidden]="!fieldIdSuperior.hasError(['notFound'])">&ndash;&gt;
+                            &lt;!&ndash;Usuário superior não encontrado&ndash;&gt;
+                            &lt;!&ndash;</div>&ndash;&gt;
+                            &lt;!&ndash;</div>&ndash;&gt;
+                            &lt;!&ndash;</div>&ndash;&gt;
+                            <input type="text"
+                                   name="idSuperior"
+                                   [(ngModel)]="autocompleteUsuarioSuperiorSearch"
+                                   [(modelValue)]="info.idSuperior"
+                                   uiInput
+                                   uiAutocomplete
+                                   (input)="getUsuarios()"
+                                   (focus)="getUsuarios()"
+                                   (loadMore)="loadMoreUsuarios()"
+                                   [primary]="'nome'"
+                                   [secondary]="'logon'"
+                                   [list]="usuarios"
+                                   [loading]="usuarios.carregando">
+                            <label>Usuário superior</label>
+                        </ui-input-container>
+                    </div>
+                    <div class="ui-flex-container break-on-s480">
+                        <ui-input-container>
+                            <input id="inputNome" #fieldNome="ngModel" type="text" [(ngModel)]="info.nome"
+                                   uiInput
+                                   name="nome"
+                                   required
+                                   uiMaxlength="70">
+                            <label for="inputNome">Nome</label>
+                            <div class="ui-messages">
+                                <div *ngIf="fieldNome.errors && fieldNome.dirty">
+                                    <div class="ui-message error"
+                                         [hidden]="!fieldNome.pristine && !fieldNome.errors.required">
+                                        Nome é obrigatório
+                                    </div>
+                                    <div class="ui-message counter error"
+                                         [hidden]="!fieldNome.errors.uiMaxlength">
+                                        {{info.nome ? info.nome.length : 0}}/70
+                                    </div>
+                                </div>
+                            </div>
+                        </ui-input-container>
+                        <ui-input-container>
+                            <input id="inputLogon" #fieldLogon="ngModel" type="text"
+                                   [(ngModel)]="info.logon" uiInput
+                                   name="logon"
+                                   required uiMaxlength="30">
+                            <label for="inputLogon">Logon</label>
+                            <div class="ui-messages">
+                                <div *ngIf="fieldLogon.errors && fieldLogon.dirty">
+                                    <div class="ui-message error"
+                                         [hidden]="!fieldLogon.pristine && !fieldLogon.errors.required">
+                                        Logon é obrigatório
+                                    </div>
+                                    <div class="ui-message counter error"
+                                         [hidden]="!fieldLogon.errors.uiMaxlength">
+                                        {{info.logon ? info.logon.length : 0}}/30
+                                    </div>
+                                    <div class="ui-message error"
+                                         [hidden]="!fieldLogon.hasError(['existingLogon'])">
+                                        Logon existente
+                                    </div>
+                                </div>
+                            </div>
+                        </ui-input-container>
+                    </div>
+                    <div class="ui-flex-container break-on-s480">
+                        <ui-input-container>
+                            <input id="inputQuantidadeDiasExpiraSenha" type="tel"
+                                   [(ngModel)]="info.quantidadeDiasExpiraSenha"
+                                   name="quantidadeDiasExpiraSenha"
+                                   uiInput uiMaskInteger>
+                            <label for="inputQuantidadeDiasExpiraSenha">Qtd. de dias para senha
+                                expirar</label>
+                        </ui-input-container>
+                        <ui-switch-container *ngIf="!addingNew">
+                            <div class="info">
+                                Próxima expiração de senha
+                                <span class="secondary" *ngIf="!info.expirarSenha">
+                                    {{convertToDate(info.dataExpiracao).getTime() > today.getTime() ? (info.dataExpiracao | date : 'dd/MM/yyyy') : 'Já expirou'}}
+                                </span>
+                                <span class="secondary" *ngIf="info.expirarSenha">
+                                    Quando confirmar alteração
+                                </span>
+                            </div>
+                            <button class="ui-button flat"
+                                    uiRipple type="button"
+                                    [disabled]="convertToDate(info.dataExpiracao).getTime() < today.getTime() && !info.expirarSenha"
+                                    (click)="toggleExpire()"
+                                    style="width: 100px">
+                                {{!info.expirarSenha ? 'Expirar' : 'Cancelar'}}
+                            </button>
+                        </ui-switch-container>
+                        <div class="flex" *ngIf="addingNew"></div>
+                    </div>
+                    <div class="ui-flex-container break-on-s480">
+                        <ui-switch-container *ngIf="!addingNew">
+                            <div class="info">
+                                Usuário bloqueado
+                                <span class="secondary">
+                                    {{(info.dataBloqueio && !info.dataDesbloqueio) ? (convertToDate(info.dataBloqueio).getTime() > today.getTime() ? 'Ainda não (agendado para ' : 'Sim (em ') + (info.dataBloqueio | date : 'dd/MM/yyyy') + ')' : (convertToDate(info.dataDesbloqueio).getTime() > today.getTime() ? 'Sim (desbloqueio agendado para ' + (info.dataDesbloqueio | date : 'dd/MM/yyyy') + ')' : 'Não')}}
+                                </span>
+                            </div>
+                            <button class="ui-button flat icon" uiRipple type="button"
+                                    [uiDialogTrigger]="dialogBlock">
+                                <i class="material-icons">lock{{!info.bloqueado ? '_open' : ''}}</i>
+                            </button>
+                        </ui-switch-container>
+                        <ui-switch-container>
+                            <label for="inputRestringeIp" class="info">
+                                Restringir IP
+                                <span class="secondary">{{info.restringeIp ? 'Sim' : 'Não'}}</span>
+                            </label>
+                            <ui-switch class="action">
+                                <input id="inputRestringeIp" type="checkbox"
+                                       name="restringeIp"
+                                       [checked]="info.restringeIp"
+                                       (change)="info.restringeIp = $event.target.checked">
+                            </ui-switch>
+                        </ui-switch-container>
+                        <div class="flex" *ngIf="addingNew"></div>
+                    </div>
+                    <ui-smart-list #ips [model]="info.ips">
+                        <div *ngIf="info.restringeIp">
+                            <ui-subheader>
+                                IP{{info.ips.length > 1 ? 's' : ''}} liberado{{info.ips.length > 1 ? 's' :
+                                ''}}
+                            </ui-subheader>
+                            <div *ngFor="let item of ips.list; let i = index;">
+                                <div class="ui-flex-container">
+                                    <div class="ui-flex-container break-on-s840">
+                                        <ui-input-container>
+                                            <input [id]="'input' + i + 'ip'" #fieldIP="ngModel" type="text"
+                                                   [name]="i + 'ip'"
+                                                   [(ngModel)]="item.ip"
+                                                   uiInput [required]="i < ips.list.length - 1">
+                                            <label [for]="'input' + i + 'ip'">IP</label>
+                                            <div class="ui-messages">
+                                                <div *ngIf="fieldIP.errors && fieldIP.dirty">
+                                                    <div class="ui-message error"
+                                                         [hidden]="!fieldIP.pristine && !fieldIP.errors.required">
+                                                        IP é obrigatório
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ui-input-container>
+                                    </div>
+                                    <div style="width: 100%; max-width: 36px; display: flex;">
+                                        <button *ngIf="i < ips.list.length - 1" (click)="ips.remove(i);"
+                                                class="ui-button icon flat" type="button" uiRipple>
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ui-smart-list>
+                    <ui-smart-list #telefones [model]="info.telefones" [default-item]="defaultItemTelefone">
+                        <ui-subheader>Telefone{{info.telefones.length > 1 ? 's' : ''}}</ui-subheader>
+                        <div *ngFor="let item of telefones.list; let i = index;">
+                            <div class="ui-flex-container">
+                                <div class="ui-flex-container break-on-s840">
+                                    <ui-input-container>
+                                        <input [id]="'input' + i + 'telefone'" #fieldTelefone="ngModel"
+                                               type="tel" [name]="i + 'telefone'"
+                                               [(ngModel)]="item.telefone"
+                                               uiInput [required]="i < telefones.list.length - 1"
+                                               uiMaskPhone>
+                                        <label [for]="'input' + i + 'telefone'">Número</label>
+                                        <div class="ui-messages">
+                                            <div *ngIf="fieldTelefone.errors && fieldTelefone.dirty">
+                                                <div class="ui-message error"
+                                                     [hidden]="!fieldTelefone.pristine && !fieldTelefone.errors.required">
+                                                    Número é obrigatório
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui-input-container>
+                                    <div class="ui-flex-container">
+                                        <ui-input-container style="width: 100%; max-width: 100px">
+                                            <input [id]="'input' + i + 'ramal'" #fieldRamal="ngModel"
+                                                   type="tel" [name]="i + 'ramal'"
+                                                   [(ngModel)]="item.ramal"
+                                                   uiInput>
+                                            <label [for]="'input' + i + 'ramal'">Ramal</label>
+                                        </ui-input-container>
+                                        <ui-input-container>
+                                            <select [id]="'input' + i + 'idTipoTelefone'"
+                                                    [(ngModel)]="item.idTipoTelefone"
+                                                    [name]="i + 'idTipoTelefone'"
+                                                    uiInput
+                                                    [required]="i < telefones.list.length - 1"
+                                                    #fieldTipoTelefone="ngModel">
+                                                <option></option>
+                                                <option *ngFor="let tipoTelefone of tiposTelefone"
+                                                        [ngValue]="tipoTelefone.id">
+                                                    {{tipoTelefone.nome}}
+                                                </option>
+                                            </select>
+                                            <label [for]="'input' + i + 'idTipoTelefone'">
+                                                {{tiposTelefone.carregado
+                                                ? 'Tipo de telefone' : 'Carregando tipos de telefone'}}
+                                            </label>
+                                            <div class="ui-messages">
+                                                <div
+                                                    *ngIf="fieldTipoTelefone.errors && fieldTipoTelefone.dirty">
+                                                    <div class="ui-message error"
+                                                         [hidden]="!fieldTipoTelefone.pristine && !fieldTipoTelefone.errors.required">
+                                                        Campo obrigatório
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ui-input-container>
+                                    </div>
+                                    <ui-option-container>
+                                        <ui-option>
+                                            <input [id]="'input' + i + 'permiteMensagem'" type="checkbox"
+                                                   [checked]="item.permiteMensagem"
+                                                   (change)="item.permiteMensagem=$event.target.checked"
+                                                   [name]="i + 'permiteMensagem'">
+                                            <label [for]="'input' + i + 'permiteMensagem'">
+                                                Permite mensagem
+                                            </label>
+                                        </ui-option>
+                                    </ui-option-container>
+                                </div>
+                                <div style="width: 100%; max-width: 36px;display: flex;">
+                                    <button *ngIf="i < telefones.list.length - 1"
+                                            (click)="telefones.remove(i);"
+                                            class="ui-button icon flat" type="button" uiRipple>
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ui-smart-list>
+                    <ui-smart-list #emails [model]="info.emails">
+                        <ui-subheader>E-mail{{info.emails.length > 1 ? 's' : ''}}</ui-subheader>
+                        <div *ngFor="let item of emails.list; let i = index;">
+                            <div class="ui-flex-container">
+                                <div class="ui-flex-container break-on-s600">
+                                    <div class="ui-flex-container">
+                                        <ui-input-container>
+                                            <input [id]="'input' + i + 'email'" #fieldEmail="ngModel"
+                                                   type="text" [name]="i + 'email'"
+                                                   [(ngModel)]="item.email"
+                                                   uiInput [required]="i < emails.list.length - 1"
+                                                   uiMaxlength="255"
+                                                   pattern="[a-z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-z0-9-]+(\.[a-z0-9-]+)*">
+                                            <label [for]="'input' + i + 'email'">E-mail</label>
+                                            <div class="ui-messages">
+                                                <div *ngIf="fieldEmail.errors && fieldEmail.dirty">
+                                                    <div class="ui-message error"
+                                                         [hidden]="!fieldEmail.pristine && !fieldEmail.errors.required">
+                                                        E-mail é obrigatório
+                                                    </div>
+                                                    <div class="ui-message error"
+                                                         [hidden]="!fieldEmail.errors.pattern">
+                                                        E-mail está inválido
+                                                    </div>
+                                                    <div class="ui-message counter error"
+                                                         [hidden]="!fieldEmail.errors.uiMaxlength">
+                                                        {{item.email ? item.email.length : 0}}/255
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ui-input-container>
+                                    </div>
+                                    <ui-input-container style="width: 100%; max-width: 130px">
+                                        <select [id]="'input' + i + 'idTipoEmail'"
+                                                [(ngModel)]="item.idTipoEmail"
+                                                [name]="i + 'idTipoEmail'"
+                                                uiInput
+                                                [required]="i < emails.list.length - 1"
+                                                #fieldTipoEmail="ngModel">
+                                            <option></option>
+                                            <option *ngFor="let tipoEmail of tiposEmail"
+                                                    [ngValue]="tipoEmail.id">
+                                                {{tipoEmail.nome}}
+                                            </option>
+                                        </select>
+                                        <label [for]="'input' + i + 'idTipoEmail'">
+                                            {{tiposEmail.carregado
+                                            ? 'Tipo de e-mail' : 'Carregando tipos de e-mail'}}
+                                        </label>
+                                        <div class="ui-messages">
+                                            <div *ngIf="fieldTipoEmail.errors && fieldTipoEmail.dirty">
+                                                <div class="ui-message error"
+                                                     [hidden]="!fieldTipoEmail.pristine && !fieldTipoEmail.errors.required">
+                                                    Campo obrigatório
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui-input-container>
+                                </div>
+                                <div style="width: 100%; max-width: 36px; display: flex;">
+                                    <button *ngIf="i < emails.list.length - 1" (click)="emails.remove(i)"
+                                            class="ui-button icon flat" type="button" uiRipple>
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ui-smart-list>
+                    <div *ngIf="sistema.restringeDiaHora">
+                        <ui-subheader>
+                            Acesso dia e hora
+                        </ui-subheader>
+                        <div *ngFor="let weekDay of info.acessoDiaHora; let i = index">
+                            <ui-option-container>
+                                <ui-option>
+                                    <input [id]="'input' + i + 'diaDaSemana'" type="checkbox"
+                                           [checked]="weekDay.ativo"
+                                           (change)="weekDay.ativo=$event.target.checked"
+                                           [name]="weekDay.id + 'diaDaSemana'">
+                                    <label [for]="'input' + i + 'diaDaSemana'">
+                                        {{weekDay.nome}} {{weekDay.ativo ? ('(' +
+                                        acessoDiaHoraViewFormat(weekDay.horaInicial) + ' - ' +
+                                        acessoDiaHoraViewFormat(weekDay.horaFinal) + ')') : ''}}
+                                    </label>
+                                </ui-option>
+                            </ui-option-container>
+                            <ui-input-container>
+                                <ui-slider [range]="dayHours" [(begin)]="weekDay.horaInicial"
+                                           [(end)]="weekDay.horaFinal"
+                                           [view-format]="acessoDiaHoraViewFormat"
+                                           [disabled]="!weekDay.ativo"></ui-slider>
+                            </ui-input-container>
+                        </div>
+                    </div>
+                    <div class="secondary-text" *ngIf="info.nomeUsuarioCadastro">
+                        <div>
+                            Cadastrado por {{info.nomeUsuarioCadastro}}
+                            em {{info.dataCadastro | date : 'dd/MM/yyyy hh:mm'}}
+                        </div>
+                        <div *ngIf="info.nomeUsuarioAlteracao">
+                            Alterado por {{info.nomeUsuarioAlteracao}}
+                            em {{info.dataAlteracao | date : 'dd/MM/yyyy hh:mm'}}
+                        </div>
+                    </div>-->
+                </ui-card-content>
+            </fieldset>
+        </ui-card>
+        <pre>{{info | json}}</pre>
+        <div class="ui-fab-container">
+            <button class="ui-button success fab" uiRipple [class.hide]="deleting || loading">
+                <ui-progress-radial class="indeterminate" *ngIf="saving"></ui-progress-radial>
+                <i class="material-icons">check</i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<ui-menu #menuDelete>
+    <div class="ui-menu-content size-2x">
+        <ui-subheader>Deseja excluir?</ui-subheader>
+        <div class="ui-menu-item" uiRipple (click)="confirmDelete()">
+            Sim
+        </div>
+        <div class="ui-menu-item" uiRipple>
+            Não
+        </div>
+    </div>
+</ui-menu>
+
+<div style="height: 80px"></div>

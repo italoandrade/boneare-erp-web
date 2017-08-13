@@ -1,0 +1,55 @@
+<ui-card [ngClass]="{'raising': !tvshow.notRaising, 'marked-as-watched': tvshow.markedAsWatched, 'archived': tvshow.type === 'archived'}">
+    <a [href]="tvshow.url">
+        <div class="poster">
+            <img class="responsive" alt="Poster" uiLazyLoad [lazy-src]="tvshow.poster">
+            <div class="overlay-soon" *ngIf="tvshow.episode" [class.show]="isAfterToday(tvshow.episode.date)">
+                {{isAfterToday(tvshow.episode.date) ? (tvshow.episode.date | uiTimeAgo : 'Daqui ' : '' : false :
+                true) : ''}}
+            </div>
+            <div class="overlay-flags ui-button-container align-right"
+                 *ngIf="showEpisodeCount || tvshow.type === 'archived' || (tvshow.episode && tvshow.episode.new) || tvshow.favorite">
+                <div *ngIf="tvshow.favorite" class="ui-button icon flat flag"
+                     title="Favorito">
+                    <i class="material-icons">star</i>
+                </div>
+                <div *ngIf="tvshow.type === 'archived'" class="ui-button icon flat flag" title="Arquivado">
+                    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                        <path fill="#FFF"
+                              d="M3,3H21V7H3V3M4,8H20V21H4V8M9.5,11A0.5,0.5 0 0,0 9,11.5V13H15V11.5A0.5,0.5 0 0,0 14.5,11H9.5Z"/>
+                    </svg>
+                </div>
+                <div *ngIf="tvshow.episode && tvshow.episode.new" class="ui-button icon flat flag"
+                     title="Novo episódio">
+                    <i class="material-icons">new_releases</i>
+                </div>
+                <div *ngIf="showEpisodeCount" class="ui-button icon flat flag"
+                     [title]="'Tem ' + tvshow.countToWatch + ' episódio' + (tvshow.countToWatch != 1 ? 's' : '') + ' para assistir'">
+                    {{tvshow.countToWatch < 1000 ? tvshow.countToWatch : '+999'}}
+                </div>
+            </div>
+        </div>
+        <div class="ui-progress">
+            <div class="determinate" [style.width]="tvshow.progress"></div>
+        </div>
+    </a>
+    <ui-card-content>
+        <div class="title">
+            <a [href]="tvshow.url">{{tvshow.title}}</a>
+        </div>
+        <div class="subtitle" *ngIf="tvshow.episode">
+            <a [href]="tvshow.episode.url">
+                {{tvshow.episode.title}} - {{tvshow.episode.seasonEpisode}}
+            </a>
+        </div>
+        <button class="ui-button primary raised icon" *ngIf="tvshow.episode" uiRipple
+                (mousedown)="tvshow.notRaising = true"
+                (mouseout)="tvshow.notRaising = false"
+                (mouseup)="tvshow.notRaising = false"
+                (click)="markAsWatched()"
+                [class.hide]="isAfterToday(tvshow.episode.date)">
+            <ui-progress-radial class="indeterminate" *ngIf="tvshow.markingAsWatched"></ui-progress-radial>
+            <i class="material-icons">visibility</i>
+        </button>
+    </ui-card-content>
+</ui-card>
+<!---->

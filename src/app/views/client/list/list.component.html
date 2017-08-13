@@ -1,0 +1,104 @@
+<div class="ui-s960">
+    <ui-card>
+        <div class="ui-progress" [class.hide]="!(loading && !searching)">
+            <div class="indeterminate"></div>
+        </div>
+        <ui-toolbar class="flat">
+            <span class="title" [ngClass]="{'hide': searchOpen}">Lista de clientes</span>
+            <div class="align-right">
+                <form #searchForm="ngForm" name="searchForm" class="ui-validate on-dirty"
+                      [ngClass]="{'open': searchOpen}">
+                    <ui-input-container>
+                        <input #searchFormText="ngModel" type="text" name="searchText" [(ngModel)]="searchText"
+                               uiMaxlength="200" uiInput [persistPlaceholder]="true" placeholder="Pesquisa"
+                               (keyup)="search(searchFormText.value)">
+                        <div class="ui-messages">
+                            <div *ngIf="searchFormText.errors && searchFormText.dirty">
+                                <div class="ui-message counter error">
+                                    {{searchText ? searchText.length : 0}}/200
+                                </div>
+                            </div>
+                        </div>
+                    </ui-input-container>
+                </form>
+                <button class="ui-button flat icon search" uiRipple (click)="toggleSearch()">
+                    <ui-progress-radial class="indeterminate" *ngIf="searching"></ui-progress-radial>
+                    <i class="material-icons" [ngClass]="{'show': !searchOpen}">search</i>
+                    <i class="material-icons" [ngClass]="{'show': searchOpen}">close</i>
+                </button>
+            </div>
+        </ui-toolbar>
+        <ui-data-table>
+            <tbody>
+            <tr>
+                <th class="picture">
+                </th>
+                <th uiDataTableOrderBy (click)="toggleOrderBy('name')">
+                    Nome Fantasia
+                </th>
+                <th uiDataTableOrderBy (click)="toggleOrderBy('cnpj')">
+                    CNPJ
+                </th>
+                <th uiDataTableOrderBy (click)="toggleOrderBy('email')">
+                    E-mail
+                </th>
+                <th uiDataTableOrderBy (click)="toggleOrderBy('phone')">
+                    Telefone
+                </th>
+            </tr>
+            <tr *ngFor="let client of clients" [routerLink]="['/client', client.id]">
+                <td class="picture">
+                    <div class="letter"
+                         [ngStyle]="{'background-color': client.color, 'color': isBright(client.color) ? '#000' : '#FFF'}">
+                        {{client.name.substring(0, 1)}}
+                    </div>
+                </td>
+                <td>
+                    <span class="ellipsis">
+                    {{client.name}}
+                    </span>
+                </td>
+                <td class="no-wrap">
+                    {{client.cnpj | uiCnpj}}
+                </td>
+                <td>
+                    {{client.email}}
+                </td>
+                <td class="no-wrap">
+                    {{client.phone | uiPhone}}
+                </td>
+            </tr>
+            <tr class="empty" *ngIf="!clients || !clients.length">
+                <td colspan="4">{{loading ? 'Carregando...' : 'Nenhum cliente encontrado'}}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="4" class="align-right">
+                    <div class="ui-button-container align-right">
+                        <span class="pagination">
+                            {{((this.page - 1) * 10) + 1}}-{{this.page * 10 < this.lineCount ? this.page * 10 :
+                            this.lineCount}} de {{this.lineCount}}
+                        </span>
+                        <button class="ui-button flat icon" uiRipple [disabled]="this.page < 2"
+                                (click)="this.page = this.page - 1; this.getClients();">
+                            <i class="material-icons">keyboard_arrow_left</i>
+                        </button>
+                        <button class="ui-button flat icon" uiRipple [disabled]="this.lineCount < this.page * 10"
+                                (click)="this.page = this.page + 1; this.getClients();">
+                            <i class="material-icons">keyboard_arrow_right</i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        </ui-data-table>
+    </ui-card>
+    <div class="ui-fab-container">
+        <a class="ui-button accent fab" uiRipple href="/client/new" (click)="goInfo($event)">
+            <i class="material-icons">add</i>
+        </a>
+    </div>
+</div>
+
+<div style="height: 80px"></div>

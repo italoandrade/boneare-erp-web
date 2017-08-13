@@ -1,0 +1,132 @@
+@import '~ng-smn-ui/core/variables';
+@import '../../../app.theme';
+
+:host {
+    user-select: none;
+
+    ui-card {
+        //height: 100%;
+        position: relative;
+        pointer-events: none;
+
+        &.archived {
+            opacity: 0.8;
+
+            transition: box-shadow 0.28s ui-easing('deceleration'),
+            opacity 0.28s ui-easing('deceleration');
+
+            &:hover,
+            &:focus {
+                opacity: 1;
+            }
+        }
+
+        > a {
+            display: block;
+            pointer-events: auto;
+        }
+
+        .ui-progress {
+            position: absolute;
+            top: 0;
+
+            background-color: rgba(black, 0.3);
+
+            .determinate {
+                background-color: ui-color('green', '500');
+            }
+        }
+
+        .poster {
+            position: relative;
+            min-height: 30px;
+            background-color: ui-color('grey', '300');
+
+            .overlay-soon {
+                position: absolute;
+                background-color: rgba(black, 0.3);
+                color: white;
+                top: 0;
+                height: 100%;
+                width: 100%;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                text-align: center;
+
+                opacity: 0;
+                transition: opacity 280ms ui-easing('deceleration');
+
+                &.show {
+                    opacity: 1;
+                }
+            }
+
+            .overlay-flags {
+                position: absolute;
+                top: 0;
+                height: 100%;
+                width: 100%;
+
+                padding: 10px;
+
+                display: flex;
+                justify-content: flex-end;
+                align-items: flex-start;
+
+                text-align: center;
+
+                .flag {
+                    background-color: rgba(black, 0.5);
+                    color: white;
+                }
+            }
+        }
+
+        ui-card-content {
+            position: relative;
+
+            button {
+                pointer-events: auto;
+                position: absolute;
+                top: -18px;
+                right: 10px;
+
+                .ui-progress {
+                    position: absolute;
+                }
+
+                @at-root :host ui-card.marked-as-watched ui-card-content button {
+                    transform: scale(0);
+                }
+
+                &.hide {
+                    transform: scale(0);
+                }
+            }
+        }
+
+        .title a {
+            pointer-events: auto;
+            color: map_get($theme, primary-text-color);
+            @at-root :host-context(.dark) ui-card .title a {
+                color: map_get($theme-dark, primary-text-color);
+            }
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .subtitle a {
+            pointer-events: auto;
+            color: map_get($theme, secondary-text-color);
+            @at-root :host-context(.dark) ui-card .subtitle a {
+                color: map_get($theme-dark, secondary-text-color);
+            }
+            text-decoration: none;
+        }
+    }
+}
+
+/**/

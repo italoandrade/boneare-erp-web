@@ -1,0 +1,67 @@
+@import "~ng-smn-ui/core/variables";
+
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 16px;
+    box-shadow: ui-shadow('2dp');
+    flex: 0 0 auto;
+    transition: transform 280ms ui-easing('deceleration');
+
+    &:first-child {
+        animation: enter-notification-pop 280ms ui-easing('deceleration');
+    }
+
+    & + /deep/ tfy-notification-pop:not(.nothing) {
+        position: absolute;
+        z-index: -1;
+        transform: translateX(110%);
+        transform: translateX(calc(100% + 20px));
+    }
+
+    min-width: 288px;
+    margin: 16px 16px;
+    border-radius: 2px;
+    max-width: 568px;
+
+    position: absolute;
+    top: 64px;
+    right: 0;
+
+    &.leave {
+        transform: translateX(110%); //Suporte para margin
+        transform: translateX(calc(100% + 20px));
+    }
+
+    .ui-button:not(.success):not(.warning):not(.error):not(:disabled) {
+        margin-right: 16px;
+        width: 25px;
+        height: 25px;
+        min-height: 25px;
+        i {
+            font-size: 18px;
+        }
+    }
+
+    .text {
+        color: inherit;
+        font-size: 14px;
+        padding: 14px 0;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        margin-right: 24px;
+    }
+}
+
+@keyframes enter-notification-pop {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/**/

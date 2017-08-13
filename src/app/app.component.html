@@ -1,0 +1,85 @@
+<ui-toolbar class="fixed flat elevate-on-scroll primary" id="app-header">
+    <button (click)="menuOpen = true" class="ui-button flat icon" uiRipple>
+        <i class="material-icons">menu</i>
+    </button>
+    <a class="logo" routerLink="/">
+        <img src="/assets/icons/boneare.png"
+             alt="">
+    </a>
+    <div class="title">{{title}}</div>
+    <div class="align-right">
+        <div *ngIf="user">
+            <button class="ui-button icon user" uiRipple
+                    [style.background-image]="user.picture ? 'url(' + user.picture + ')' : null"
+                    [style.background-color]="user.color"
+                    [class.is-bright]="!user.picture && isBright(user.color)"
+                    [uiMenuTrigger]="menuUser"
+                    align="right">
+                {{!user.picture ? user.fullname.charAt(0) : ''}}
+            </button>
+        </div>
+        <div *ngIf="!user">
+            <a class="ui-button flat icon" uiRipple routerLink="/signin">
+                <i class="material-icons">person</i>
+            </a>
+        </div>
+    </div>
+</ui-toolbar>
+
+<ui-nav-drawer class="persistent" [(open)]="menuOpen">
+    <ui-toolbar class="flat">
+        <button (click)="menuOpen = false" class="ui-button flat icon" uiRipple>
+            <i class="material-icons">menu</i>
+        </button>
+        <a class="logo" routerLink="/">
+            <img src="/assets/icons/boneare.png"
+                 alt="">
+        </a>
+        <span class="title">{{title}}</span>
+    </ui-toolbar>
+    <div class="ui-nav-drawer-overflow">
+        <div class="ui-list">
+            <div *ngIf="user">
+                <a class="ui-list-item" uiRipple routerLink="/" [routerLinkActive]="['active']"
+                   [routerLinkActiveOptions]="{ exact: true }">
+                    <span class="icon">
+                        <i class="material-icons">home</i>
+                    </span>
+                    Início
+                </a>
+                <a class="ui-list-item" uiRipple routerLink="/client" [routerLinkActive]="['active']">
+                    <span class="icon">
+                        <i class="material-icons">group</i>
+                    </span>
+                    Clientes
+                </a>
+            </div>
+            <div *ngIf="!user">
+
+                <a class="ui-list-item" uiRipple routerLink="/signin">
+                    <span class="icon">
+                        <i class="material-icons">person</i>
+                    </span>
+                    Iniciar sessão
+                </a>
+            </div>
+        </div>
+    </div>
+</ui-nav-drawer>
+
+<router-outlet></router-outlet>
+
+<ui-snackbar-container></ui-snackbar-container>
+<tfy-notification-pop-container *ngIf="user"></tfy-notification-pop-container>
+
+<ui-menu #menuUser>
+    <div class="ui-menu-content size-2x" *ngIf="user">
+        <a class="ui-menu-item" uiRipple [routerLink]="user.url">
+            <b>{{user.fullname}}</b>
+        </a>
+        <div class="ui-divider"></div>
+        <div class="ui-menu-item" uiRipple (click)="signOut()">
+            Sair
+        </div>
+    </div>
+</ui-menu>

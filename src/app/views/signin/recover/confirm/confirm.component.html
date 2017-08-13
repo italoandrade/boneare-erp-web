@@ -1,0 +1,91 @@
+<div class="background ui-nav-drawer-persistent" [class.loading]="submitting">
+    <div class="ui-toolbar-space"></div>
+    <ui-card>
+        <div class="ui-progress primary">
+            <div class="indeterminate"></div>
+        </div>
+        <ui-card-title>
+            <img class="logo" src="/assets/icons/android-chrome-192x192.png"/>
+            Recupere sua conta
+        </ui-card-title>
+        <ui-card-subtitle>escolha uma senha nova</ui-card-subtitle>
+        <ui-card-content>
+            <form #formForgotPassword="ngForm" class="ui-validate on-dirty on-submit" (submit)="onSubmit(formForgotPassword)">
+                <ui-input-container>
+                    <input type="email" [(ngModel)]="info.email" name="email" uiInput readonly>
+                    <label>E-mail</label>
+                </ui-input-container>
+                <ui-input-container>
+                    <input [type]="showPassword ? 'text' : 'password'"
+                           [(ngModel)]="info.password"
+                           name="password"
+                           uiInput
+                           required
+                           #fieldPassword="ngModel"
+                           uiMaxlength="60">
+                    <label>Nova senha</label>
+                    <div class="suffix ui-button flat icon" (click)="showPassword = !showPassword" uiRipple>
+                        <i class="material-icons light">{{showPassword ? 'visibility_off' : 'visibility'}}</i>
+                    </div>
+                    <div class="ui-messages">
+                        <div *ngIf="fieldPassword.errors && fieldPassword.dirty">
+                            <div class="ui-message error"
+                                 [hidden]="!fieldPassword.pristine && !fieldPassword.errors.required">
+                                Senha é obrigatória
+                            </div>
+                            <div class="ui-message counter error" [hidden]="!fieldPassword.errors.uiMaxlength">
+                                {{info.password ? info.password.length : 0}}/60
+                            </div>
+                        </div>
+                    </div>
+                </ui-input-container>
+                <ui-input-container>
+                    <input [type]="showConfirmPassword ? 'text' : 'password'"
+                           [(ngModel)]="info.confirmPassword"
+                           name="confirmPassword"
+                           uiInput
+                           required
+                           #fieldConfirmPassword="ngModel"
+                           uiMaxlength="60">
+                    <label>Confirme a senha</label>
+                    <div class="suffix ui-button flat icon" (click)="showConfirmPassword = !showConfirmPassword"
+                         uiRipple>
+                        <i class="material-icons light">{{showConfirmPassword ? 'visibility_off' : 'visibility'}}</i>
+                    </div>
+                    <div class="ui-messages">
+                        <div *ngIf="fieldConfirmPassword.errors && fieldConfirmPassword.dirty">
+                            <div class="ui-message error"
+                                 [hidden]="!fieldConfirmPassword.pristine && !fieldConfirmPassword.errors.required">
+                                Confirmação de senha é obrigatória
+                            </div>
+                            <div class="ui-message counter error"
+                                 [hidden]="!fieldConfirmPassword.errors.uiMaxlength">
+                                {{info.confirmPassword ? info.confirmPassword.length : 0}}/60
+                            </div>
+                            <div class="ui-message error"
+                                 [hidden]="!fieldConfirmPassword.hasError(['wrongConfirmation'])">
+                                Confirmação de senha não confere
+                            </div>
+                        </div>
+                    </div>
+                </ui-input-container>
+                <div class="ui-button-container align-right">
+                    <div class="go-back">
+                        <a href="/signin" (click)="goBack($event)">Voltar</a>
+                    </div>
+                    <button class="ui-button primary" uiRipple
+                            [disabled]="!formForgotPassword.valid && formForgotPassword.dirty">
+                        Recuperar
+                    </button>
+                </div>
+            </form>
+        </ui-card-content>
+    </ui-card>
+    <div class="ui-button-container cover">
+        <button class="ui-button accent raised facebook" uiRipple>
+            <img src="/assets/img/facebook.svg" alt="">
+            Entrar com Facebook
+        </button>
+    </div>
+</div>
+<!---->

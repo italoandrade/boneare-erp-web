@@ -1,0 +1,171 @@
+@import "~ng-smn-ui/core/variables";
+@import "../../../app.theme";
+
+.wrap-notifications {
+    position: fixed;
+    z-index: 2;
+
+    transform-origin: bottom;
+    transition: transform 225ms ui-easing('acceleration'), opacity 195ms ui-easing('acceleration');
+    transform: scale(0.8) translateY(16px);
+
+    opacity: 0;
+    max-width: 300px;
+    max-height: 348px;
+    width: 100%;
+    cursor: default;
+
+    .arrow {
+        content: "";
+        top: 0;
+        right: 6px;
+        position: fixed;
+        background-color: ui-if(map_get($theme, is-dark), #424242, #FFF);
+        transform: rotate(45deg);
+        width: 28px;
+        height: 28px;
+        z-index: -1;
+    }
+
+    ui-card {
+        box-shadow: ui-shadow('8dp');
+
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: 300px;
+        min-height: 100px;
+
+        .item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+            font-size: 14px;
+            position: relative;
+            display: block;
+
+            /*transition: transform 0.28s ui-easing('deceleration'),
+            max-height 0.28s ui-easing('deceleration') 0.1s,
+            display 1ms 0.28s;*/
+
+            transform-origin: top;
+
+            max-height: 200px;
+
+            //background-color: #fff;
+
+            &:last-child {
+                border-bottom: 1px solid transparent;
+            }
+
+            &.hide {
+                transform: translateX(100%);
+                max-height: 0;
+                border-bottom: none;
+            }
+
+            .top {
+                font-size: 12px;
+                //color: #9E9E9E;
+                user-select: none;
+
+                span {
+                    margin: 0 5px;
+                }
+
+                .type {
+                    color: map_get($theme, primary-color);
+                    margin-left: 0;
+                }
+
+                .timestamp {
+                    margin-right: 0;
+                }
+
+                .expand {
+                    margin: 0;
+                    color: #2196F3;
+
+                    .up {
+                        display: none;
+                    }
+
+                    i {
+                        font-size: 15px;
+                        vertical-align: middle;
+                    }
+                }
+            }
+
+            .author {
+                margin-top: 7px;
+                font-weight: 400;
+                margin-bottom: 3px;
+                user-select: none;
+            }
+
+            .content {
+                box-sizing: border-box;
+                position: relative;
+                padding: 12px 10px;
+            }
+
+            .message {
+                //color: #9E9E9E;
+            }
+
+            .clear {
+                min-width: 0;
+                width: 20px;
+                height: 20px;
+                min-height: 20px;
+                padding: 3px;
+                border-radius: 10px;
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                margin: 0;
+
+                i {
+                    font-size: 14px;
+                    vertical-align: top;
+                }
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            //color: #9E9E9E;
+            padding: 0 20px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.28s ui-easing('deceleration') 0.5s,
+            max-height 0.28s ui-easing('deceleration') 0.2s,
+            padding 0.28s ui-easing('deceleration') 0.2s;
+            max-height: 0;
+
+            &.show {
+                opacity: 1;
+                max-height: 300px;
+                padding: 20px;
+            }
+
+            i {
+                margin-top: 10px;
+                font-size: 60px;
+            }
+        }
+    }
+
+    &.open {
+        transition: transform 225ms ui-easing('deceleration'), opacity 195ms ui-easing('deceleration');
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.dark .wrap-notifications .arrow {
+    background-color: #424242;
+}
+
+.light .wrap-notifications .arrow {
+    background-color: #FFF;
+}
+/**/

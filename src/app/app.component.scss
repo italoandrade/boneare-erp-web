@@ -1,0 +1,65 @@
+@import "~ng-smn-ui/core/core";
+@import "~ng-smn-ui/core/variables";
+@import "./app.theme";
+@import "./core/components/notifications/pop/notification-pop.theme";
+
+@include ui-core();
+
+@include ui-build-theme($theme);
+
+html {
+    background-color: transparent;
+}
+
+.dark {
+    @at-root body#{&} {
+        background-color: #303030;
+        color: map_get($theme-dark, primary-text-color);
+    }
+
+    @include ui-build-theme($theme-dark);
+}
+
+.light {
+    @at-root body#{&} {
+        background-color: #FAFAFA;
+        color: map_get($theme-dark, primary-text);
+    }
+
+    @include ui-build-theme($theme);
+}
+
+a {
+    &,
+    &.dark,
+    &.light {
+        color: map_get($theme, primary-color);
+    }
+
+    &.accent {
+        color: map_get($theme, accent-color);
+    }
+}
+
+ui-toolbar.fixed header .user {
+    background-size: cover;
+    background-position: center;
+
+    &.ui-button:not(.success):not(.warning):not(.error):not([disabled]) {
+        color: ui-text-color('black');
+        .ui-ripple-wave {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &.is-bright {
+            color: ui-text-color('white');
+
+            .ui-ripple-wave {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+}
+
+@include tfy-notification-pop($theme);
+/**/

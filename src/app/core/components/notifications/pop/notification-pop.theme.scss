@@ -1,0 +1,14 @@
+@import '~ng-smn-ui/core/variables';
+
+@mixin tfy-notification-pop($theme) {
+    $color-overlay: ui-if(map-get($theme, is-dark) == true, rgba(0, 0, 0, .2), rgba(0, 0, 0, .4));
+
+    tfy-notification-pop {
+        background-color: ui-color(map_get($theme, accent));
+        color: ui-text-color(map_get($theme, accent));
+
+        .ui-button:not(.success):not(.warning):not(.error):not(:disabled) {
+            color: ui-color(map_get($theme, accent));
+        }
+    }
+}

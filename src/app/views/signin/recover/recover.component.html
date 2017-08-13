@@ -1,0 +1,58 @@
+<div class="background ui-nav-drawer-persistent" [class.loading]="submitting">
+    <div class="ui-toolbar-space"></div>
+    <ui-card>
+        <div class="ui-progress primary">
+            <div class="indeterminate"></div>
+        </div>
+        <ui-card-title>
+            <img class="logo" src="/assets/icons/android-chrome-192x192.png"/>
+            Recupere sua conta
+        </ui-card-title>
+        <ui-card-subtitle>fornecendo seu e-mail abaixo</ui-card-subtitle>
+        <ui-card-content>
+            <form #formForgotPassword="ngForm" class="ui-validate on-dirty on-submit" (submit)="onSubmit(formForgotPassword)">
+                <ui-input-container>
+                    <input type="email" [(ngModel)]="info.email" name="email" uiInput required
+                           #fieldEmail="ngModel"
+                           uiMaxlength="255" pattern="[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*">
+                    <label>E-mail</label>
+                    <div class="ui-messages">
+                        <div *ngIf="fieldEmail.errors && fieldEmail.dirty">
+                            <div class="ui-message error"
+                                 [hidden]="!fieldEmail.pristine && !fieldEmail.errors.required">E-mail é
+                                obrigatório
+                            </div>
+                            <div class="ui-message error"
+                                 [hidden]="!fieldEmail.errors.pattern">E-mail
+                                está inválido
+                            </div>
+                            <div class="ui-message counter error" [hidden]="!fieldEmail.errors.uiMaxlength">
+                                {{info.email ? info.email.length : 0}}/255
+                            </div>
+                            <div class="ui-message error"
+                                 [hidden]="!fieldEmail.hasError(['notFound'])">
+                                E-mail não encontrado
+                            </div>
+                        </div>
+                    </div>
+                </ui-input-container>
+                <div class="ui-button-container align-right">
+                    <div class="go-back">
+                        <a href="/signin" (click)="goBack($event)">Voltar</a>
+                    </div>
+                    <button class="ui-button primary" uiRipple
+                            [disabled]="!formForgotPassword.valid && formForgotPassword.dirty">
+                        Recuperar
+                    </button>
+                </div>
+            </form>
+        </ui-card-content>
+    </ui-card>
+    <div class="ui-button-container cover">
+        <button class="ui-button accent raised facebook" uiRipple>
+            <img src="/assets/img/facebook.svg" alt="">
+            Entrar com Facebook
+        </button>
+    </div>
+</div>
+<!---->

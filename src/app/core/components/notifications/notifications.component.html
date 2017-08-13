@@ -1,0 +1,39 @@
+<ng-template>
+    <div class="wrap-notifications">
+        <div class="arrow"></div>
+        <ui-card (click)="$event.stopPropagation()" (uiInfiniteLoad)="loadMore()"
+                 [(model)]="user.notifications">
+            <div class="item" *ngFor="let item of user?.notifications" [class.hide]="item.hide"
+                 [@notification]="item.id" (click)="open(item)" uiRipple>
+                <div class="content">
+                    <div class="top hint-text">
+                        <span class="type">{{item.type}}</span>•<span class="timestamp">
+                            {{item.sendDate | uiTimeAgo : '' : '' : true}}
+                        </span>
+                        <div class="clear ui-button icon flat" uiRipple tabindex="0"
+                             (click)="$event.stopPropagation(); dismiss(item);">
+                            <i class="material-icons">clear</i>
+                        </div>
+                    </div>
+                    <div class="author">
+                        <a class="primary-text" [routerLink]="[item.user.url]" (click)="$event.stopPropagation()">
+                            {{item.user.fullname}}
+                        </a>
+                    </div>
+                    <div class="message secondary-text" [innerHTML]="item.message"></div>
+                </div>
+            </div>
+            <div class="empty-state" [class.show]="!user.notifications.length">
+                <p>
+                    <span>Você não tem nenhuma nova notificação</span>
+                </p>
+                <p>
+                    <i class="material-icons">notifications_none</i>
+                </p>
+            </div>
+            <div class="ui-progress primary" [class.hide]="!loading">
+                <div class="indeterminate"></div>
+            </div>
+        </ui-card>
+    </div>
+</ng-template>
