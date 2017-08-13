@@ -16,7 +16,7 @@ import {ApiService} from '../../../core/api/api.service';
 })
 
 export class ClientListComponent implements AfterViewInit, OnInit, OnDestroy {
-    clients: Observable<any[]>;
+    clients: any;
     searchOpen: boolean;
     searching: boolean;
     loading: boolean;
