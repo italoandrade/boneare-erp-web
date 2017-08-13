@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 @angular/core@4.3.4 MIT
 
-ng-smn-ui@1.3.2 MIT
+ng-smn-ui@1.3.3 MIT
 
 @angular/router@4.3.4 MIT
 
