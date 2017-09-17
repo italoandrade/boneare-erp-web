@@ -40,7 +40,7 @@
                 <ui-input-container>
                     <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="info.password" name="password"
                            uiInput
-                           required #fieldPassword="ngModel" uiMaxlength="60">
+                           required #fieldPassword="ngModel" uiMaxlength="40">
                     <label>Senha</label>
                     <div class="suffix ui-button flat icon" (click)="showPassword = !showPassword" uiRipple>
                         <i class="material-icons">{{showPassword ? 'visibility_off' : 'visibility'}}</i>
@@ -54,7 +54,7 @@
                             </div>
                             <div class="ui-message counter error"
                                  [hidden]="!fieldPassword.errors.uiMaxlength">
-                                {{info.password ? info.password.length : 0}}/60
+                                {{info.password ? info.password.length : 0}}/40
                             </div>
                             <div class="ui-message error"
                                  [hidden]="!fieldPassword.hasError(['wrongPassword'])">

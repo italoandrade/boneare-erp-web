@@ -52,9 +52,6 @@ export class AppComponent implements OnInit {
     signOut() {
         UiCookie.delete('RNB');
         this.userService.relogin();
-        console.log(this.router);
-        console.log(this.route);
-
 
         const currentRouteConfig = this.router.config.find(f => f.path === this.router.url.substr(1));
         if (currentRouteConfig != null && currentRouteConfig.canActivate != null) {
